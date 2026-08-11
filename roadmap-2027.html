@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SHADOWPROOF — 2027 Production Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #ffffff;
+    --ink: #0f172a;
+    --ink-2: #334155;
+    --ink-3: #64748b;
+    --accent: #0369a1;
+    --accent-2: #0284c7;
+    --success: #059669;
+    --warn: #d97706;
+    --border: #e2e8f0;
+    --surface: #f8fafc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--surface); color: var(--ink);
+    font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.6;
+  }
+  .page {
+    max-width: 900px; margin: 20px auto; background: var(--paper);
+    padding: 48px 56px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; margin: 0; padding: 32px 40px; max-width: 100%; }
+    .no-print { display: none; }
+  }
+
+  .header {
+    padding-bottom: 20px; border-bottom: 3px solid var(--ink);
+    margin-bottom: 32px;
+  }
+  .doc-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: 0.2em; color: var(--accent);
+    margin-bottom: 12px; text-transform: uppercase; font-weight: 600;
+  }
+  h1 {
+    font-family: 'Fraunces', serif; font-weight: 800;
+    font-size: 32px; line-height: 1.1; letter-spacing: -0.02em;
+    color: var(--ink); margin-bottom: 6px;
+  }
+  h1 .italic { font-style: italic; color: var(--accent); font-weight: 600; }
+  .subtitle {
+    font-family: 'Fraunces', serif; font-style: italic;
+    color: var(--ink-3); font-size: 16px;
+  }
+  .meta-row {
+    display: flex; gap: 24px; margin-top: 16px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .meta-row span strong { color: var(--ink); font-weight: 600; }
+
+  .intro {
+    background: var(--surface); padding: 20px 24px;
+    border-left: 3px solid var(--accent);
+    margin-bottom: 32px; font-size: 13.5px; color: var(--ink-2);
+    line-height: 1.65;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 22px; margin: 32px 0 16px;
+    color: var(--ink); letter-spacing: -0.01em;
+  }
+  h2 .italic { font-style: italic; color: var(--accent); }
+
+  /* TIMELINE */
+  .timeline {
+    position: relative; padding-left: 32px;
+    margin: 24px 0;
+  }
+  .timeline::before {
+    content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px;
+    width: 2px; background: var(--border);
+  }
+  .quarter {
+    position: relative; padding-bottom: 28px;
+  }
+  .quarter:last-child { padding-bottom: 0; }
+  .quarter::before {
+    content: ''; position: absolute; left: -32px; top: 4px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--paper); border: 3px solid var(--accent);
+    z-index: 2;
+  }
+  .quarter.done::before { background: var(--success); border-color: var(--success); }
+  .quarter-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 12px;
+  }
+  .quarter-tag {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 700;
+    font-size: 11px; padding: 4px 10px; letter-spacing: 0.15em;
+    background: var(--ink); color: var(--paper); text-transform: uppercase;
+  }
+  .quarter-title {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 18px; color: var(--ink);
+  }
+  .quarter-title .italic { font-style: italic; color: var(--accent); }
+
+  .quarter-body {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    background: var(--surface); padding: 18px 20px;
+    border: 1px solid var(--border); border-radius: 4px;
+  }
+  .quarter-col h4 {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--ink-3); letter-spacing: 0.15em; text-transform: uppercase;
+    margin-bottom: 8px; font-weight: 600;
+  }
+  .quarter-col ul { list-style: none; padding: 0; }
+  .quarter-col li {
+    padding: 3px 0 3px 16px; position: relative;
+    font-size: 12.5px; color: var(--ink-2); line-height: 1.5;
+  }
+  .quarter-col li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--accent); font-size: 10px;
+  }
+
+  /* MILESTONES / METRICS */
+  .milestones {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin: 24px 0;
+  }
+  .milestone {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 16px 18px; border-top: 3px solid var(--accent);
+  }
+  .milestone-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    color: var(--ink-3); letter-spacing: 0.15em; text-transform: uppercase;
+    margin-bottom: 6px; font-weight: 600;
+  }
+  .milestone-value {
+    font-family: 'Fraunces', serif; font-weight: 800;
+    font-size: 22px; color: var(--ink); line-height: 1.1; margin-bottom: 4px;
+  }
+  .milestone-label {
+    font-size: 11px; color: var(--ink-3);
+  }
+
+  /* DEPENDENCY GRID */
+  .deps {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 12px; margin-top: 16px;
+  }
+  .dep {
+    display: flex; gap: 12px; padding: 12px 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .dep-owner {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; min-width: 90px;
+  }
+  .dep-item { font-size: 12px; color: var(--ink-2); flex: 1; }
+
+  .callout {
+    background: #fef3c7; border-left: 3px solid var(--warn);
+    padding: 14px 18px; margin: 20px 0;
+    font-size: 12.5px; color: var(--ink-2); line-height: 1.6;
+  }
+  .callout strong { color: var(--ink); }
+
+  footer {
+    margin-top: 40px; padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  .print-btn {
+    position: fixed; top: 20px; right: 20px;
+    padding: 10px 16px; background: var(--ink); color: var(--paper);
+    border: none; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .print-btn:hover { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">Print / Save PDF</button>
+
+<div class="page">
+  <div class="header">
+    <div class="doc-tag">ADDENDUM · 2027 PRODUCTION ROADMAP</div>
+    <h1>From prototype to <span class="italic">production.</span></h1>
+    <div class="subtitle">A quarter-by-quarter plan for productionizing SHADOWPROOF at SSFCU</div>
+    <div class="meta-row">
+      <span><strong>Prepared by:</strong> Juan Garcia · InfoSec</span>
+      <span><strong>Contingent on:</strong> Risk sponsorship + resource allocation</span>
+      <span><strong>Target GA:</strong> Q4 2027</span>
+    </div>
+  </div>
+
+  <div class="intro">
+    This roadmap assumes sponsorship secured by end of Q4 2026 and formal project kickoff in Q1 2027. It is a proposal, not a commitment — each phase gate would require sign-off from Risk, InfoSec leadership, HR, and L&amp;D before proceeding to the next. Timelines are aggressive but achievable with a single dedicated engineer (myself) plus part-time L&amp;D and IT support.
+  </div>
+
+  <h2>Milestones at a <span class="italic">glance</span></h2>
+  <div class="milestones">
+    <div class="milestone">
+      <div class="milestone-tag">Q1 2027</div>
+      <div class="milestone-value">Foundation</div>
+      <div class="milestone-label">Requirements, architecture, Azure resources provisioned</div>
+    </div>
+    <div class="milestone">
+      <div class="milestone-tag">Q2 2027</div>
+      <div class="milestone-value">Build</div>
+      <div class="milestone-label">SSO, backend, assessment engine, first 4 modules re-hosted</div>
+    </div>
+    <div class="milestone">
+      <div class="milestone-tag">Q3 2027</div>
+      <div class="milestone-value">Pilot</div>
+      <div class="milestone-label">All 16 modules live, InfoSec + one business unit pilot cohort</div>
+    </div>
+    <div class="milestone">
+      <div class="milestone-tag">Q4 2027</div>
+      <div class="milestone-value">GA</div>
+      <div class="milestone-label">Enterprise rollout, reporting live, phishing sim correlation</div>
+    </div>
+  </div>
+
+  <h2>Quarterly <span class="italic">detail</span></h2>
+
+  <div class="timeline">
+    <div class="quarter">
+      <div class="quarter-header">
+        <span class="quarter-tag">Q1 · 2027</span>
+        <span class="quarter-title">Foundation &amp; <span class="italic">approvals</span></span>
+      </div>
+      <div class="quarter-body">
+        <div class="quarter-col">
+          <h4>Workstream</h4>
+          <ul>
+            <li>Formal requirements gathering with L&amp;D + HR</li>
+            <li>InfoSec architecture review + threat model</li>
+            <li>Data governance sign-off from Legal/HR</li>
+            <li>Azure subscription + resource group provisioning</li>
+            <li>Entra ID app registration for SSO</li>
+            <li>Accessibility (WCAG 2.1 AA) audit of prototype</li>
+          </ul>
+        </div>
+        <div class="quarter-col">
+          <h4>Exit Criteria</h4>
+          <ul>
+            <li>Signed project charter</li>
+            <li>Approved architecture diagram</li>
+            <li>Data governance policy documented</li>
+            <li>Success metrics agreed (see below)</li>
+            <li>Phase gate review with Risk sponsor</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="quarter">
+      <div class="quarter-header">
+        <span class="quarter-tag">Q2 · 2027</span>
+        <span class="quarter-title">Platform <span class="italic">build</span></span>
+      </div>
+      <div class="quarter-body">
+        <div class="quarter-col">
+          <h4>Workstream</h4>
+          <ul>
+            <li>Azure App Service deployment (dev + prod)</li>
+            <li>Entra SSO integration (OIDC)</li>
+            <li>Backend API + database (progress, assessments, badges)</li>
+            <li>Assessment engine (question bank per module)</li>
+            <li>First 4 modules re-hosted with SSO + tracking</li>
+            <li>Admin reporting stub (Power BI or embedded)</li>
+          </ul>
+        </div>
+        <div class="quarter-col">
+          <h4>Exit Criteria</h4>
+          <ul>
+            <li>End-to-end SSO flow working</li>
+            <li>Assessment + badge issuance functional</li>
+            <li>Penetration test of platform passed</li>
+            <li>Internal alpha with InfoSec team (~15 users)</li>
+            <li>Content accessibility revalidated</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="quarter">
+      <div class="quarter-header">
+        <span class="quarter-tag">Q3 · 2027</span>
+        <span class="quarter-title">Pilot &amp; <span class="italic">measure</span></span>
+      </div>
+      <div class="quarter-body">
+        <div class="quarter-col">
+          <h4>Workstream</h4>
+          <ul>
+            <li>Remaining 12 modules migrated + updated</li>
+            <li>Reporting dashboard live for L&amp;D + InfoSec</li>
+            <li>Pilot cohort: InfoSec + one business unit (~50–100 users)</li>
+            <li>Phishing sim campaign pre/post pilot</li>
+            <li>Feedback collection + module iteration</li>
+            <li>Documentation for content maintenance</li>
+          </ul>
+        </div>
+        <div class="quarter-col">
+          <h4>Exit Criteria</h4>
+          <ul>
+            <li>Pilot completion rate ≥ 80%</li>
+            <li>Measurable delta in phishing sim click rate</li>
+            <li>Net Promoter Score from pilot cohort</li>
+            <li>Content governance model in place</li>
+            <li>Go/no-go decision on enterprise rollout</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="quarter">
+      <div class="quarter-header">
+        <span class="quarter-tag">Q4 · 2027</span>
+        <span class="quarter-title">Enterprise <span class="italic">rollout</span></span>
+      </div>
+      <div class="quarter-body">
+        <div class="quarter-col">
+          <h4>Workstream</h4>
+          <ul>
+            <li>Phased enterprise rollout coordinated with HR</li>
+            <li>Integration with annual training compliance</li>
+            <li>Manager-level reporting for team completion</li>
+            <li>Ongoing content refresh cadence established</li>
+            <li>2028 module roadmap defined</li>
+          </ul>
+        </div>
+        <div class="quarter-col">
+          <h4>Exit Criteria</h4>
+          <ul>
+            <li>100% of in-scope employees enrolled</li>
+            <li>Reporting integrated with compliance workflow</li>
+            <li>Steady-state operations documented</li>
+            <li>Year-1 ROI assessment scheduled for Q1 2028</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Cross-team <span class="italic">dependencies</span></h2>
+  <div class="deps">
+    <div class="dep"><span class="dep-owner">Risk</span><span class="dep-item">Executive sponsorship, phase-gate reviews, success metric approval</span></div>
+    <div class="dep"><span class="dep-owner">InfoSec</span><span class="dep-item">Architecture review, pentest, content technical accuracy</span></div>
+    <div class="dep"><span class="dep-owner">HR + L&amp;D</span><span class="dep-item">Curriculum fit, compliance integration, employee comms</span></div>
+    <div class="dep"><span class="dep-owner">Legal</span><span class="dep-item">Data governance, retention, PII handling review</span></div>
+    <div class="dep"><span class="dep-owner">IT / Cloud</span><span class="dep-item">Azure provisioning, Entra registration, ongoing support</span></div>
+    <div class="dep"><span class="dep-owner">Communications</span><span class="dep-item">Launch messaging, employee onboarding materials</span></div>
+  </div>
+
+  <h2>Proposed success <span class="italic">metrics</span></h2>
+  <div class="deps">
+    <div class="dep"><span class="dep-owner">Engagement</span><span class="dep-item">Module completion rate; time-in-module vs. skip rate</span></div>
+    <div class="dep"><span class="dep-owner">Retention</span><span class="dep-item">Knowledge check pass rates; 90-day recheck scores</span></div>
+    <div class="dep"><span class="dep-owner">Behavior</span><span class="dep-item">Phishing simulation click rate delta (pre / post training)</span></div>
+    <div class="dep"><span class="dep-owner">Reporting</span><span class="dep-item">Suspicious email report rate from trained cohort</span></div>
+  </div>
+
+  <div class="callout">
+    <strong>Note on scope.</strong> This roadmap covers building the platform and content. It does not include ongoing operational costs (Azure infrastructure, my time as content owner in steady state) or the decision on whether SHADOWPROOF supplements or replaces our current awareness vendor — both would need separate discussions with Finance and L&amp;D respectively during Q1 2027.
+  </div>
+
+  <footer>
+    <span>SHADOWPROOF · 2027 Roadmap · v1</span>
+    <span>Contingent on approval — Not a commitment</span>
+  </footer>
+</div>
+
+</body>
+</html>

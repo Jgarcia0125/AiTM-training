@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  // Profile guard: redirect to sign-in if no local profile exists.
+  (function () {
+    try {
+      if (!localStorage.getItem("shadowproof_profile_v1")) {
+        window.location.replace("signin.html");
+      }
+    } catch (e) {}
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 02 // The CEO Text — BEC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f4efe6;
+    --paper-2: #ebe4d4;
+    --ink: #1a1614;
+    --ink-2: #4a3f38;
+    --ink-3: #7a6f68;
+    --accent: #b8322b;
+    --accent-2: #d4a256;
+    --safe: #2f6b3e;
+    --border: #c9bfaf;
+    --highlight: #f5e29a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px; line-height: 1.7;
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 30%, rgba(184,50,43,0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(212,162,86,0.04) 0%, transparent 50%);
+  }
+  /* subtle paper texture */
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: 
+      repeating-linear-gradient(45deg, transparent 0, transparent 2px, rgba(122,111,104,0.02) 2px, rgba(122,111,104,0.02) 3px);
+    pointer-events:none; z-index:1;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    max-width: 1100px; margin: 0 auto; padding: 32px 40px 24px;
+    border-bottom: 3px double var(--ink);
+    text-align: center; position: relative; z-index: 2;
+  }
+  .masthead-top {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--ink-3); letter-spacing: 0.15em; text-transform: uppercase;
+    margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  }
+  .masthead h1 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(48px, 7vw, 92px); line-height: 0.9;
+    letter-spacing: -0.02em;
+  }
+  .masthead .tagline {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    color: var(--ink-2); font-size: 14px; margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .content { max-width: 1100px; margin: 0 auto; padding: 48px 40px; position: relative; z-index: 2; }
+
+  /* NAV BAR */
+  .top-nav {
+    background: var(--ink); color: var(--paper);
+    padding: 10px 24px; display: flex; justify-content: space-between; align-items: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .top-nav a { color: var(--paper); text-decoration: none; opacity: 0.7; transition: opacity 0.2s; }
+  .top-nav a:hover { opacity: 1; }
+
+  /* HEADLINE STORY */
+  .kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent); font-size: 12px;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+  }
+  .kicker::after { content:''; flex:1; height:1px; background: var(--accent); }
+
+  .headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 0.95; font-weight: 900;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .headline .italic { font-style: italic; font-weight: 700; color: var(--accent); }
+  .subhead {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-style: italic;
+    color: var(--ink-2); font-weight: 400;
+    max-width: 800px; line-height: 1.4;
+    padding-bottom: 24px; margin-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* SCENE CARD */
+  .scene {
+    display: none;
+    animation: fadeIn 0.5s ease;
+  }
+  .scene.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* TEXT MESSAGE THREAD */
+  .thread-container {
+    display: grid; grid-template-columns: 1fr 340px;
+    gap: 40px; margin-top: 32px;
+  }
+  @media (max-width: 900px) {
+    .thread-container { grid-template-columns: 1fr; }
+  }
+
+  .phone {
+    background: #1a1a1a; border-radius: 40px; padding: 12px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+    max-width: 380px; margin: 0 auto;
+  }
+  .phone-screen {
+    background: #f0f0f5; border-radius: 30px;
+    padding: 20px 16px; min-height: 560px;
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    display: flex; flex-direction: column;
+  }
+  .phone-header {
+    text-align: center; padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    margin-bottom: 16px;
+  }
+  .contact-avatar {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 600; margin: 0 auto 8px;
+  }
+  .contact-name {
+    font-size: 14px; font-weight: 600; color: #1a1a1a;
+  }
+  .contact-sub {
+    font-size: 11px; color: #666; margin-top: 2px;
+  }
+  .contact-sub .unknown {
+    background: #ffe1a3; padding: 1px 6px; border-radius: 4px;
+    color: #8a5a00; font-weight: 500;
+  }
+
+  .messages { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .msg {
+    max-width: 78%; padding: 9px 13px; border-radius: 18px;
+    font-size: 13px; line-height: 1.4;
+    animation: msgIn 0.4s ease;
+  }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .msg.them { background: #e5e5ea; color: #1a1a1a; align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg.you { background: #0084ff; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg-time { font-size: 10px; color: #999; text-align: center; margin: 8px 0 4px; }
+
+  .reply-input {
+    background: white; border: 1px solid #ccc; border-radius: 20px;
+    padding: 8px 14px; margin-top: 12px; display: flex; gap: 8px;
+    font-size: 12px; color: #999;
+  }
+  .reply-input input {
+    flex: 1; border: none; outline: none; font-family: inherit; font-size: 12px;
+    background: transparent;
+  }
+
+  /* SIDEBAR: WHAT TO LOOK FOR */
+  .sidebar {
+    background: var(--paper-2); border: 1px solid var(--border);
+    padding: 24px; position: sticky; top: 60px; max-height: 80vh; overflow-y: auto;
+  }
+  .sidebar-title {
+    font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700;
+    padding-bottom: 12px; margin-bottom: 16px;
+    border-bottom: 2px solid var(--accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sidebar-title::before { content: '⚑'; color: var(--accent); }
+  .flag-item {
+    padding: 14px 0; border-bottom: 1px dashed var(--border);
+    opacity: 0.35; transition: opacity 0.4s;
+  }
+  .flag-item:last-child { border-bottom: none; }
+  .flag-item.revealed { opacity: 1; }
+  .flag-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--accent); letter-spacing: 0.15em; margin-bottom: 4px;
+    font-weight: 700;
+  }
+  .flag-title { font-weight: 700; color: var(--ink); font-size: 14px; margin-bottom: 4px; }
+  .flag-desc { font-size: 12px; color: var(--ink-2); line-height: 1.5; }
+
+  /* CHOICE BUTTONS */
+  .choices {
+    margin-top: 24px; display: grid; gap: 10px;
+  }
+  .choice-btn {
+    padding: 14px 18px; background: white;
+    border: 2px solid var(--ink); color: var(--ink);
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer; text-align: left; transition: all 0.15s;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .choice-btn:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .choice-btn:disabled { cursor: default; opacity: 0.6; }
+  .choice-btn.correct { border-color: var(--safe); background: rgba(47,107,62,0.1); color: var(--safe); }
+  .choice-btn.wrong { border-color: var(--accent); background: rgba(184,50,43,0.08); color: var(--accent); }
+  .choice-letter {
+    font-family: 'Playfair Display', serif; font-weight: 900; font-size: 18px;
+    font-style: italic; min-width: 20px;
+  }
+
+  /* PULL QUOTE */
+  .pull-quote {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 28px; line-height: 1.3; color: var(--ink);
+    border-left: 4px solid var(--accent); padding: 20px 32px;
+    margin: 40px 0; max-width: 720px;
+    position: relative;
+  }
+  .pull-quote::before {
+    content: '"'; position: absolute; top: -20px; left: 20px;
+    font-size: 100px; color: var(--accent); opacity: 0.3;
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* Feedback callout */
+  .callout {
+    background: white; border-left: 4px solid var(--accent);
+    padding: 20px 24px; margin: 24px 0; display: none;
+  }
+  .callout.show { display: block; animation: fadeIn 0.4s; }
+  .callout.safe { border-left-color: var(--safe); }
+  .callout-title {
+    font-family: 'Playfair Display', serif; font-weight: 700; font-size: 18px;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  .callout.safe .callout-title { color: var(--safe); }
+  .callout-body { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+  .callout-body strong { color: var(--ink); }
+
+  /* NAV BUTTONS */
+  .scene-nav {
+    margin-top: 48px; display: flex; justify-content: space-between;
+    padding-top: 24px; border-top: 1px solid var(--border);
+  }
+  .btn {
+    padding: 12px 24px; background: transparent;
+    border: 2px solid var(--ink); color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer;
+    transition: all 0.15s; font-weight: 600;
+  }
+  .btn:hover { background: var(--ink); color: var(--paper); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  .btn.primary:hover { background: #8f2620; border-color: #8f2620; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* CHECKLIST FINAL */
+  .checklist {
+    display: grid; gap: 16px; margin: 32px 0;
+  }
+  .check-item {
+    background: white; border: 1px solid var(--border);
+    padding: 20px 24px; display: flex; gap: 20px; align-items: start;
+  }
+  .check-num {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 32px; font-weight: 700; color: var(--accent);
+    line-height: 1; min-width: 40px;
+  }
+  .check-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; color: var(--ink); }
+  .check-desc { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+
+  /* PROGRESS DOTS */
+  .progress-dots {
+    display: flex; gap: 8px; justify-content: center;
+    margin: 24px 0;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border); transition: all 0.3s;
+  }
+  .dot.active { background: var(--accent); width: 24px; border-radius: 4px; }
+  .dot.done { background: var(--ink); }
+
+  .scenario-tag {
+    display: inline-block; background: var(--ink); color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    padding: 4px 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .completion {
+    text-align: center; padding: 60px 20px;
+    background: var(--paper-2); border: 2px solid var(--ink);
+    margin-top: 40px;
+  }
+  .completion-title {
+    font-family: 'Playfair Display', serif; font-size: 48px;
+    font-weight: 900; line-height: 1;
+    margin-bottom: 16px;
+  }
+  .completion-title .italic { font-style: italic; color: var(--accent); }
+
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="index.html">← ALL MODULES</a>
+  <span>MODULE 02 // BUSINESS EMAIL COMPROMISE</span>
+  <span id="clock">--:--:--</span>
+</div>
+
+<div class="masthead">
+  <div class="masthead-top">
+    <span>VOL. II · No. 02</span>
+    <span>THE HUMAN LEDGER</span>
+    <span>TUES · Q4</span>
+  </div>
+  <h1>The Human Ledger</h1>
+  <div class="tagline">A weekly dispatch on the small deceptions costing companies millions</div>
+</div>
+
+<div class="content">
+  <div class="progress-dots" id="dots">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+
+  <!-- SCENE 1: OPENING -->
+  <section class="scene active" id="scene-1">
+    <div class="kicker">Cover Story · Est. Reading Time 8 min</div>
+    <h2 class="headline">"Are you at your desk? I need a quick <span class="italic">favor.</span>"</h2>
+    <p class="subhead">
+      The message arrives at 4:47 PM on a Friday. Your CEO's name is on it. Something feels urgent, personal, quiet. In the next ten minutes, an employee somewhere in the country will lose their company between four and seventy thousand dollars — because they wanted to be helpful.
+    </p>
+    <div class="pull-quote">
+      Business Email Compromise is not a technical attack. It's a social one — designed to make a good employee do a bad thing before their better judgment catches up.
+    </div>
+
+    <p style="max-width:720px;color:var(--ink-2);font-size:16px;">
+      In this training you'll see a real-world BEC unfold as a text and email exchange. At each turn you'll decide what to do. There are no trick questions — only patterns to recognize, and habits to build.
+    </p>
+
+    <div class="scene-nav">
+      <a href="index.html" class="btn">← All Modules</a>
+      <button class="btn primary" onclick="goToScene(2)">Begin →</button>
+    </div>
+  </section>
+
+  <!-- SCENE 2: THE OPENING TEXT -->
+  <section class="scene" id="scene-2">
+    <div class="scenario-tag">Scene 01 / The Opening</div>
+    <h2 class="headline">A text from an unknown number.</h2>
+    <p class="subhead">
+      You're wrapping up for the weekend. Your phone lights up. It's not a saved contact — but the person seems to know you, and the name they mention is your CEO's. Read carefully. What do you do?
+    </p>
+
+    <div class="thread-container">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-header">
+            <div class="contact-avatar">?</div>
+            <div class="contact-name">+1 (346) 555-0129</div>
+            <div class="contact-sub"><span class="unknown">Unknown Number</span></div>
+          </div>
+          <div class="messages" id="msgs-1">
+            <div class="msg-time">Friday 4:47 PM</div>
+            <div class="msg them">Hi, are you available? I need your help with something quick. — David</div>
+            <div class="msg them">This is David Chen, your CEO. I got a new phone and lost some contacts.</div>
+          </div>
+          <div class="reply-input">
+            <input placeholder="iMessage" disabled>
+            <span>◀</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="sidebar-title">Signals to Read</div>
+        <div class="flag-item" data-flag="unknown">
+          <div class="flag-num">SIGNAL 01</div>
+          <div class="flag-title">Unknown number, familiar name</div>
+          <div class="flag-desc">A real executive doesn't text you from a number you don't have saved. The "new phone" explanation is the most common opener in BEC.</div>
+        </div>
+        <div class="flag-item" data-flag="channel">
+          <div class="flag-num">SIGNAL 02</div>
+          <div class="flag-title">Off-channel contact</div>
+          <div class="flag-desc">Real business happens in email, Teams, Slack — channels that leave a record. Personal text = red flag.</div>
+        </div>
+        <div class="flag-item" data-flag="urgency">
+          <div class="flag-num">SIGNAL 03</div>
+          <div class="flag-title">Vague urgency</div>
+          <div class="flag-desc">"Quick help," "are you available," "need a favor" — the request is deliberately foggy. That fog is a tool.</div>
+        </div>
+        <div class="flag-item" data-flag="timing">
+          <div class="flag-num">SIGNAL 04</div>
+          <div class="flag-title">Late Friday afternoon</div>
+          <div class="flag-desc">Attackers time these for when you're mentally checked out and IT staff have gone home. Weekends and holidays are peak BEC hours.</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:32px;font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:var(--ink);">What's your move?</p>
+    <div class="choices" id="choices-2">
+      <button class="choice-btn" onclick="answer2(this, 'reply')">
+        <span class="choice-letter">A.</span>
+        Reply back — "Hi David, what do you need?" It's the CEO, better be responsive.
+      </button>
+      <button class="choice-btn" onclick="answer2(this, 'verify')">
+        <span class="choice-letter">B.</span>
+        Ignore the text. Send David a message on Teams asking if he really texted you.
+      </button>
+      <button class="choice-btn" onclick="answer2(this, 'block')">
+        <span class="choice-letter">C.</span>
+        Block the number and delete the message.
+      </button>
+    </div>
+
+    <div class="callout" id="cb2a">
+      <div class="callout-title">A common instinct — but it's what the attacker wants.</div>
+      <div class="callout-body">
+        Replying confirms your number is active and that you believe the story. From here, the attacker gets to shape the conversation. <strong>The right move is to verify through a known channel</strong> — Teams, Slack, or David's known desk line — before you engage. Reveal all four signals above to see everything wrong with the opening message.
+      </div>
+    </div>
+    <div class="callout safe" id="cb2b">
+      <div class="callout-title">That's the right instinct.</div>
+      <div class="callout-body">
+        Verifying through a <strong>known channel</strong> (Teams, Slack, David's known desk phone) is the single most effective defense against BEC. In this scenario the real David is at his desk and never sent a text. But let's follow what would have happened if you'd replied — because most of your coworkers will.
+      </div>
+    </div>
+    <div class="callout" id="cb2c">
+      <div class="callout-title">Understandable — but you'd miss the lesson.</div>
+      <div class="callout-body">
+        Blocking is fine for obvious spam, but the report step matters. Forwarding the message to your IT/Security team helps them warn everyone else — often, when one employee gets a BEC text, dozens do. <strong>Report first, block second.</strong>
+      </div>
+    </div>
+
+    <div class="scene-nav">
+      <button class="btn" onclick="goToScene(1)">← Back</button>
+      <button class="btn primary" id="s2next" onclick="goToScene(3)" disabled>Continue →</button>
+    </div>
+  </section>
+
+  <!-- SCENE 3: THE ASK -->
+  <section class="scene" id="scene-3">
+    <div class="scenario-tag">Scene 02 / The Ask</div>
+    <h2 class="headline">The <span class="italic">real</span> request.</h2>
+    <p class="subhead">
+      Let's say a colleague did reply — this is what would arrive next. Notice how the request becomes concrete, specific, and time-boxed.
+    </p>
+
+    <div class="thread-container">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-header">
+            <div class="contact-avatar" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">?</div>
+            <div class="contact-name">+1 (346) 555-0129</div>
+            <div class="contact-sub"><span class="unknown">Unknown Number</span></div>
+          </div>
+          <div class="messages" id="msgs-2">
+            <div class="msg them">Great, thanks for responding! I'm in back-to-back meetings today so I can't take a call.</div>
+            <div class="msg them">I need you to pick up some Apple gift cards for a client appreciation gift. It's time-sensitive — client is flying out tonight.</div>
+            <div class="msg them">Can you grab 10 x $500 cards from Target on your way home? I'll reimburse Monday. Just send me photos of the codes when done.</div>
+            <div class="msg them">Please keep this between us for now — it's a surprise announcement.</div>
+          </div>
+          <div class="reply-input">
+            <input placeholder="iMessage" disabled>
+            <span>◀</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="sidebar-title">The BEC Fingerprint</div>
+        <div class="flag-item revealed">
+          <div class="flag-num">TELL 01</div>
+          <div class="flag-title">Gift cards, wire, or crypto</div>
+          <div class="flag-desc">If a request involves gift cards, wire transfers, cryptocurrency, or changed banking details — treat it as hostile until proven otherwise.</div>
+        </div>
+        <div class="flag-item revealed">
+          <div class="flag-num">TELL 02</div>
+          <div class="flag-title">"I can't take a call"</div>
+          <div class="flag-desc">The attacker cannot pass a voice check. This excuse is designed to block the one verification that would expose them.</div>
+        </div>
+        <div class="flag-item revealed">
+          <div class="flag-num">TELL 03</div>
+          <div class="flag-title">"Keep this between us"</div>
+          <div class="flag-desc">Isolation is a weapon. Real executives don't ask you to hide business transactions from colleagues.</div>
+        </div>
+        <div class="flag-item revealed">
+          <div class="flag-num">TELL 04</div>
+          <div class="flag-title">"I'll reimburse you"</div>
+          <div class="flag-desc">You are being asked to front the money personally. That is never a legitimate business process. Never.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pull-quote">
+      In 2023, gift-card BEC scams cost U.S. businesses over $50 million. Not because CFOs authorized it — because well-meaning employees did.
+    </div>
+
+    <div class="scene-nav">
+      <button class="btn" onclick="goToScene(2)">← Back</button>
+      <button class="btn primary" onclick="goToScene(4)">See the Email Version →</button>
+    </div>
+  </section>
+
+  <!-- SCENE 4: EMAIL BEC / WIRE FRAUD -->
+  <section class="scene" id="scene-4">
+    <div class="scenario-tag">Scene 03 / The Higher-Stakes Version</div>
+    <h2 class="headline">The vendor <span class="italic">who moved.</span></h2>
+    <p class="subhead">
+      Gift-card BEC is the low-stakes version. This one — invoice redirection — is where companies lose six or seven figures at a time. It arrives quietly. It looks routine. Read every line.
+    </p>
+
+    <div style="background:white;border:1px solid var(--border);padding:32px;margin-top:24px;max-width:820px;box-shadow: 4px 4px 0 rgba(0,0,0,0.1);">
+      <div style="border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:20px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-3);">
+        <div><strong style="color:var(--ink);">From:</strong> Jennifer Marks &lt;<span style="background:var(--highlight);padding:1px 4px;" title="Look carefully">jmarks@acme-corp.net</span>&gt;</div>
+        <div><strong style="color:var(--ink);">To:</strong> ap@yourcompany.com</div>
+        <div><strong style="color:var(--ink);">Subject:</strong> Updated Banking Details for Invoice #INV-4471</div>
+        <div><strong style="color:var(--ink);">Date:</strong> Friday, 4:52 PM</div>
+      </div>
+      <div style="font-family:'Inter',sans-serif;font-size:14px;line-height:1.7;color:var(--ink);">
+        <p style="margin-bottom:12px;">Hi team,</p>
+        <p style="margin-bottom:12px;">I hope you're doing well. I'm reaching out regarding invoice <strong>INV-4471</strong> (originally sent 3 weeks ago).</p>
+        <p style="margin-bottom:12px;">Our accounting firm has changed our banking partner. Please update our details in your system before processing payment:</p>
+        <div style="background:var(--paper-2);padding:16px;border-left:3px solid var(--accent);font-family:'IBM Plex Mono',monospace;font-size:12px;margin:12px 0;">
+          <strong>NEW Bank:</strong> First Meridian Trust<br>
+          <strong>Routing:</strong> 021000021<br>
+          <strong>Account:</strong> 8847290011<br>
+          <strong>Beneficiary:</strong> Acme Corp LLC
+        </div>
+        <p style="margin-bottom:12px;">Please confirm receipt and process at your earliest convenience — we're working to close our books for the month.</p>
+        <p style="margin-bottom:12px;">Best regards,<br>Jennifer Marks<br>Accounts Receivable, Acme Corp</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:32px;">
+      <div style="background:var(--paper-2);border-left:3px solid var(--accent);padding:16px 20px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:0.15em;margin-bottom:4px;">DOMAIN LOOK</div>
+        <div style="font-weight:700;margin-bottom:4px;">acme-corp<strong style="color:var(--accent);">.net</strong> vs .com</div>
+        <div style="font-size:12px;color:var(--ink-2);">The real Acme uses acme-corp.com. This attacker registered acme-corp.net weeks ago.</div>
+      </div>
+      <div style="background:var(--paper-2);border-left:3px solid var(--accent);padding:16px 20px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:0.15em;margin-bottom:4px;">THE ASK</div>
+        <div style="font-weight:700;margin-bottom:4px;">Banking change on existing invoice</div>
+        <div style="font-size:12px;color:var(--ink-2);">Vendors change banks — but any change should trigger phone verification to a known contact.</div>
+      </div>
+      <div style="background:var(--paper-2);border-left:3px solid var(--accent);padding:16px 20px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:0.15em;margin-bottom:4px;">TIMING</div>
+        <div style="font-weight:700;margin-bottom:4px;">Late Friday, "closing our books"</div>
+        <div style="font-size:12px;color:var(--ink-2);">Urgency + weekend + specific-sounding reason = classic pressure play.</div>
+      </div>
+    </div>
+
+    <div class="pull-quote">
+      One phone call — to a number the vendor gave you six months ago, not one in the email — would have caught this. That call is the single most valuable habit in accounts payable.
+    </div>
+
+    <div class="scene-nav">
+      <button class="btn" onclick="goToScene(3)">← Back</button>
+      <button class="btn primary" onclick="goToScene(5)">Continue to Playbook →</button>
+    </div>
+  </section>
+
+  <!-- SCENE 5: PLAYBOOK / DEBRIEF -->
+  <section class="scene" id="scene-5">
+    <div class="scenario-tag">Debrief / Your Playbook</div>
+    <h2 class="headline">The <span class="italic">five habits</span> that stop BEC.</h2>
+    <p class="subhead">
+      No technology solves BEC completely. What stops it is a small set of habits that any employee can build. Read these once, and read them again.
+    </p>
+
+    <div class="checklist">
+      <div class="check-item">
+        <div class="check-num">1.</div>
+        <div>
+          <div class="check-title">Verify the person, not the message.</div>
+          <div class="check-desc">Any request involving money, credentials, banking changes, or gift cards — call the person on a number you already have, or message them on Teams/Slack. Not the number in the email. Not the number they gave you. The one you already trust.</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-num">2.</div>
+        <div>
+          <div class="check-title">Assume unusual channels are hostile.</div>
+          <div class="check-desc">Your CEO doesn't need to text you from an unknown number. Your CFO doesn't ask for wire changes over WhatsApp. A vendor doesn't switch banks via a stranger's Gmail. The channel is often the tell.</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-num">3.</div>
+        <div>
+          <div class="check-title">Read the domain like you're being paid to.</div>
+          <div class="check-desc">acme-corp.net vs acme-corp.com. yourcompany.co vs yourcompany.com. Look for extra letters, missing letters, and swapped TLDs. Attackers register lookalike domains hours before they use them.</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-num">4.</div>
+        <div>
+          <div class="check-title">Urgency is a weapon. Recognize it.</div>
+          <div class="check-desc">"Before the client leaves," "closing the books," "I'm in a meeting" — these phrases are engineered to bypass your judgment. Whenever you feel rushed by a message, that's the moment to slow down.</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-num">5.</div>
+        <div>
+          <div class="check-title">Report every suspicious message. Even if unsure.</div>
+          <div class="check-desc">When one employee gets a BEC message, dozens usually do. Your report protects everyone else. IT would rather see ten false positives than miss the one that empties the treasury.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="completion">
+      <div class="completion-title">You now recognize <span class="italic">the pattern.</span></div>
+      <p style="max-width:600px;margin:16px auto 32px;font-family:'Playfair Display',serif;font-style:italic;color:var(--ink-2);font-size:18px;">
+        Every BEC scam follows the same skeleton. Once you can see the skeleton, the disguise stops working. Pass the knowledge check below to earn your badge.
+      </p>
+      <button class="btn primary" id="startCheckBtn" onclick="revealAssessment()">Take the Knowledge Check →</button>
+    </div>
+
+    <div id="shadowproof-assessment" style="margin-top:32px;"></div>
+
+    <div class="scene-nav">
+      <button class="btn" onclick="goToScene(4)">← Back</button>
+      <a href="index.html" class="btn">Return to Suite →</a>
+    </div>
+  </section>
+</div>
+
+<script>
+  const totalScenes = 5;
+  let currentScene = 1;
+  const MODULE_ID = 'bec';
+
+  function updateDots() {
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.remove('active','done');
+      if (i + 1 < currentScene) d.classList.add('done');
+      if (i + 1 === currentScene) d.classList.add('active');
+    });
+  }
+
+  function goToScene(n) {
+    if (n < 1 || n > totalScenes) return;
+    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+    document.getElementById('scene-' + n).classList.add('active');
+    currentScene = n;
+    updateDots();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function answer2(btn, choice) {
+    document.querySelectorAll('#choices-2 .choice-btn').forEach(b => b.disabled = true);
+    document.querySelectorAll('.callout').forEach(c => c.classList.remove('show'));
+    if (choice === 'reply') {
+      btn.classList.add('wrong');
+      document.getElementById('cb2a').classList.add('show');
+    } else if (choice === 'verify') {
+      btn.classList.add('correct');
+      document.getElementById('cb2b').classList.add('show');
+    } else {
+      btn.classList.add('wrong');
+      document.getElementById('cb2c').classList.add('show');
+    }
+    // reveal signals
+    document.querySelectorAll('#scene-2 .flag-item').forEach(f => f.classList.add('revealed'));
+    document.getElementById('s2next').disabled = false;
+  }
+
+  function revealAssessment() {
+    document.getElementById('startCheckBtn').style.display = 'none';
+    ShadowproofAssessment.init({
+      moduleId: MODULE_ID,
+      moduleTitle: 'The CEO Text',
+      questions: window.SHADOWPROOF_QUESTIONS.bec
+    });
+    document.getElementById('shadowproof-assessment').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function updateClock() {
+    document.getElementById('clock').textContent = new Date().toTimeString().slice(0,8);
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+</script>
+
+<script src="questions.js"></script>
+<script src="assessment.js"></script>
+
+</body>
+</html>

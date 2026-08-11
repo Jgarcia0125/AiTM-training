@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHADOWPROOF // Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Fraunces:ital,wght@0,400;0,600;0,800;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d10;
+    --bg-2: #0f1418;
+    --surface: #131a20;
+    --surface-2: #1a232b;
+    --border: #243038;
+    --text: #e8eef2;
+    --text-dim: #8a9ba8;
+    --text-muted: #5a6b78;
+    --accent: #00ff9f;
+    --accent-dim: #00b873;
+    --danger: #ff4757;
+    --warn: #ffb84d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    line-height: 1.6; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 3px);
+    pointer-events:none; z-index:1000; opacity:0.4; mix-blend-mode:multiply;
+  }
+  .grid-bg {
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px; opacity: 0.15;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+    z-index: 0; pointer-events: none;
+  }
+
+  .card {
+    max-width: 520px; width: 100%; z-index: 1;
+    position: relative;
+  }
+
+  .brand {
+    text-align: center; margin-bottom: 40px;
+  }
+  .brand-tag {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 10px;
+    letter-spacing: 0.25em; color: var(--accent); margin-bottom: 20px;
+    padding: 6px 12px; border: 1px solid var(--accent-dim);
+    background: rgba(0, 255, 159, 0.05);
+  }
+  .brand-tag::before { content:''; width:6px; height:6px; background: var(--accent); border-radius:50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .brand-name {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent); font-weight: 800; letter-spacing: 0.2em;
+    font-size: 14px; margin-bottom: 24px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(40px, 6vw, 56px); line-height: 1;
+    font-weight: 800; letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+  h1 .italic { font-style: italic; color: var(--accent); font-weight: 600; }
+  .brand-sub {
+    font-family: 'Fraunces', serif;
+    color: var(--text-dim); font-size: 17px;
+    max-width: 420px; margin: 0 auto; line-height: 1.5;
+  }
+
+  .form-panel {
+    background: var(--bg-2); border: 1px solid var(--border);
+    padding: 32px; position: relative;
+  }
+  .form-panel::before {
+    content:''; position: absolute; top: -1px; left: -1px;
+    width: 30px; height: 30px;
+    border-top: 2px solid var(--accent);
+    border-left: 2px solid var(--accent);
+  }
+  .form-panel::after {
+    content:''; position: absolute; bottom: -1px; right: -1px;
+    width: 30px; height: 30px;
+    border-bottom: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+  }
+
+  .form-title {
+    font-family: 'Fraunces', serif; font-size: 22px;
+    font-weight: 700; margin-bottom: 6px;
+  }
+  .form-sub {
+    color: var(--text-dim); font-size: 12px;
+    margin-bottom: 28px;
+  }
+
+  .form-field {
+    margin-bottom: 20px;
+  }
+  .form-field label {
+    display: block; font-size: 10px; letter-spacing: 0.2em;
+    color: var(--text-dim); text-transform: uppercase;
+    margin-bottom: 8px; font-weight: 600;
+  }
+  .form-field input {
+    width: 100%; padding: 12px 16px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-family: inherit; font-size: 14px;
+    outline: none; transition: border-color 0.15s;
+  }
+  .form-field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 255, 159, 0.1);
+  }
+  .form-field input::placeholder { color: var(--text-muted); }
+  .form-field .helper {
+    font-size: 11px; color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .cta {
+    width: 100%; padding: 14px;
+    background: var(--accent); color: var(--bg);
+    border: none; font-family: inherit; font-size: 12px;
+    font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-top: 8px;
+  }
+  .cta:hover { background: var(--text); box-shadow: 0 0 20px rgba(0, 255, 159, 0.4); }
+  .cta:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--text-muted); font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    margin: 24px 0;
+  }
+  .divider::before, .divider::after {
+    content:''; flex:1; height:1px; background: var(--border);
+  }
+
+  .resume-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 16px 20px; margin-bottom: 20px;
+    display: none;
+  }
+  .resume-panel.show { display: block; }
+  .resume-label { font-size: 10px; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 4px; }
+  .resume-name { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .resume-meta { color: var(--text-dim); font-size: 12px; margin-bottom: 12px; }
+  .resume-actions { display: flex; gap: 8px; }
+  .resume-btn {
+    flex: 1; padding: 8px 12px; background: var(--accent);
+    color: var(--bg); border: none; font-family: inherit;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase; cursor: pointer;
+    text-decoration: none; text-align: center;
+  }
+  .resume-btn:hover { background: var(--text); }
+  .resume-btn.secondary { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+  .resume-btn.secondary:hover { color: var(--danger); border-color: var(--danger); background: transparent; }
+
+  .privacy-notice {
+    background: var(--surface); padding: 16px 20px;
+    border-left: 3px solid var(--accent-dim);
+    font-size: 11px; color: var(--text-dim);
+    line-height: 1.6; margin-top: 24px;
+  }
+  .privacy-notice strong { color: var(--text); }
+
+  .error {
+    color: var(--danger); font-size: 12px;
+    margin-top: 8px; padding: 8px 12px;
+    background: rgba(255, 71, 87, 0.1);
+    border-left: 2px solid var(--danger);
+    display: none;
+  }
+  .error.show { display: block; }
+
+  footer {
+    text-align: center; margin-top: 40px;
+    font-size: 10px; letter-spacing: 0.15em;
+    color: var(--text-muted); text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div class="card">
+  <div class="brand">
+    <div class="brand-tag">SHADOWPROOF v1.0 · SECURE ACCESS</div>
+    <h1>Welcome to your<br><span class="italic">training suite.</span></h1>
+    <div class="brand-sub">Create a local profile to save progress, earn badges, and pick up where you left off.</div>
+  </div>
+
+  <div class="form-panel">
+    <div class="resume-panel" id="resumePanel">
+      <div class="resume-label">◉ EXISTING PROFILE DETECTED</div>
+      <div class="resume-name" id="resumeName">—</div>
+      <div class="resume-meta" id="resumeMeta">—</div>
+      <div class="resume-actions">
+        <a href="index.html" class="resume-btn">Continue →</a>
+        <button class="resume-btn secondary" onclick="clearProfile()">Sign Out</button>
+      </div>
+    </div>
+
+    <div id="newProfileForm">
+      <div class="form-title">Create your profile</div>
+      <div class="form-sub">Takes about 10 seconds. No verification, no email required.</div>
+
+      <div class="form-field">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" placeholder="Alex Chen" autocomplete="name" required>
+        <div class="helper">Shown on your badges and profile.</div>
+      </div>
+
+      <div class="form-field">
+        <label for="email">Email or Username</label>
+        <input type="text" id="email" placeholder="alex.chen@company.com" autocomplete="email" required>
+        <div class="helper">Used to identify your profile on this device.</div>
+      </div>
+
+      <div class="form-field">
+        <label for="dept">Department (Optional)</label>
+        <input type="text" id="dept" placeholder="Information Security" autocomplete="organization-title">
+      </div>
+
+      <div class="error" id="errorMsg"></div>
+
+      <button class="cta" onclick="createProfile()">
+        Start Training →
+      </button>
+    </div>
+
+    <div class="privacy-notice">
+      <strong>▲ Privacy Notice.</strong> This is a training prototype. Your profile is stored only in this browser's local storage — it is never sent to a server, never shared with anyone, and stays on this device. Clear your browser data and the profile is gone. This is not a real authentication system and does not replace SSFCU corporate identity.
+    </div>
+  </div>
+
+  <footer>SHADOWPROOF // ADVERSARIAL TRAINING SUITE</footer>
+</div>
+
+<script>
+  const PROFILE_KEY = 'shadowproof_profile_v1';
+  const PROGRESS_KEY = 'shadowproof_progress_v1';
+
+  function getProfile() {
+    try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); }
+    catch { return null; }
+  }
+
+  function getProgress() {
+    try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}'); }
+    catch { return {}; }
+  }
+
+  function checkExistingProfile() {
+    const profile = getProfile();
+    if (!profile) return;
+
+    const progress = getProgress();
+    const completed = Object.values(progress).filter(p => p?.completed).length;
+
+    document.getElementById('resumeName').textContent = profile.name;
+    document.getElementById('resumeMeta').innerHTML = `${profile.email} · ${completed}/16 modules complete`;
+    document.getElementById('resumePanel').classList.add('show');
+    document.getElementById('newProfileForm').style.display = 'none';
+  }
+
+  function createProfile() {
+    const name = document.getElementById('fullName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const dept = document.getElementById('dept').value.trim();
+    const errorEl = document.getElementById('errorMsg');
+
+    if (!name || name.length < 2) {
+      errorEl.textContent = 'Please enter your full name.';
+      errorEl.classList.add('show');
+      return;
+    }
+    if (!email || email.length < 3) {
+      errorEl.textContent = 'Please enter an email or username.';
+      errorEl.classList.add('show');
+      return;
+    }
+
+    const profile = {
+      name, email, dept: dept || null,
+      created: Date.now(),
+      lastActive: Date.now()
+    };
+
+    try {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+      window.location.href = 'index.html';
+    } catch (e) {
+      errorEl.textContent = 'Could not save profile. Is localStorage disabled?';
+      errorEl.classList.add('show');
+    }
+  }
+
+  function clearProfile() {
+    if (!confirm('Sign out and clear all training progress? This cannot be undone.')) return;
+    localStorage.removeItem(PROFILE_KEY);
+    localStorage.removeItem(PROGRESS_KEY);
+    localStorage.removeItem('shadowproof_badges_v1');
+    location.reload();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    checkExistingProfile();
+    // Allow Enter to submit
+    ['fullName', 'email', 'dept'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('keypress', e => {
+        if (e.key === 'Enter') createProfile();
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

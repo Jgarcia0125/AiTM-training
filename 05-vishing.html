@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  // Profile guard: redirect to sign-in if no local profile exists.
+  (function () {
+    try {
+      if (!localStorage.getItem("shadowproof_profile_v1")) {
+        window.location.replace("signin.html");
+      }
+    } catch (e) {}
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 05 // The Voice on the Line — Vishing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Serif+Text:ital@0;1&family=Space+Mono:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1512;
+    --bg-2: #221b16;
+    --cream: #f0e5d0;
+    --cream-dim: #ccbea3;
+    --cream-mute: #7f7360;
+    --gold: #d4a656;
+    --gold-dim: #8f6f2f;
+    --red: #c73838;
+    --border: #3d3226;
+    --shadow: rgba(0, 0, 0, 0.5);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg); color: var(--cream);
+    font-family: 'DM Serif Text', serif;
+    font-size: 16px; line-height: 1.7; min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at 20% 30%, rgba(212, 166, 86, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 70%, rgba(199, 56, 56, 0.04) 0%, transparent 60%);
+  }
+  /* film grain */
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:1000;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 3px),
+      radial-gradient(circle at 30% 30%, transparent 40%, rgba(0,0,0,0.4) 100%);
+    opacity: 0.6;
+  }
+
+  /* TOP BAR */
+  .brass-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: linear-gradient(180deg, var(--bg-2), var(--bg));
+    border-bottom: 1px solid var(--gold-dim);
+    padding: 12px 32px; display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--cream-mute);
+  }
+  .brass-bar a { color: var(--cream-dim); text-decoration: none; }
+  .brass-bar a:hover { color: var(--gold); }
+  .brass-bar .center { color: var(--gold); letter-spacing: 0.3em; }
+
+  /* MARQUEE HERO */
+  .marquee {
+    max-width: 1200px; margin: 0 auto;
+    padding: 80px 40px 60px;
+    text-align: center;
+    position: relative;
+    border-bottom: 2px solid var(--gold-dim);
+  }
+  .marquee::before {
+    content: ''; position: absolute;
+    top: 32px; left: 40px; right: 40px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  }
+  .marquee::after {
+    content: ''; position: absolute;
+    bottom: 32px; left: 40px; right: 40px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  }
+  .now-showing {
+    font-family: 'Space Mono', monospace;
+    color: var(--gold); font-size: 12px;
+    letter-spacing: 0.4em; text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  h1.title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(56px, 10vw, 130px);
+    line-height: 0.95; font-weight: 400;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+    text-shadow: 0 4px 20px var(--shadow);
+    margin-bottom: 12px;
+  }
+  h1.title .italic { font-style: italic; color: var(--gold); }
+  .tagline {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: clamp(20px, 2.4vw, 32px);
+    color: var(--cream-dim); margin: 24px 0 16px;
+    max-width: 720px; margin-left: auto; margin-right: auto;
+  }
+  .runtime {
+    font-family: 'Space Mono', monospace;
+    color: var(--cream-mute); font-size: 11px;
+    letter-spacing: 0.3em; text-transform: uppercase;
+  }
+
+  /* CONTENT */
+  .content { max-width: 1100px; margin: 0 auto; padding: 60px 40px; }
+
+  .act-label {
+    font-family: 'Space Mono', monospace;
+    color: var(--gold); font-size: 12px;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .act-label::before, .act-label::after { content:''; flex: 1; height: 1px; background: var(--gold-dim); }
+
+  .scene { display: none; }
+  .scene.active { display: block; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2.act-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(40px, 6vw, 68px);
+    line-height: 1; font-weight: 400;
+    color: var(--cream); margin-bottom: 24px;
+    text-align: center;
+  }
+  h2.act-title .italic { font-style: italic; color: var(--gold); }
+
+  .prose {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; line-height: 1.6;
+    color: var(--cream-dim); max-width: 780px;
+    margin: 0 auto 40px; text-align: center;
+  }
+  .prose strong { color: var(--cream); font-weight: 500; }
+
+  .prose-left {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px; line-height: 1.7;
+    color: var(--cream-dim); max-width: 740px;
+    margin-bottom: 32px;
+  }
+
+  /* CALL TRANSCRIPT */
+  .transcript-frame {
+    background: var(--bg-2);
+    border: 1px solid var(--gold-dim);
+    padding: 40px; margin: 40px auto;
+    max-width: 820px; position: relative;
+    box-shadow: 0 20px 60px var(--shadow);
+  }
+  .transcript-frame::before {
+    content:''; position: absolute;
+    top: -1px; left: -1px; width: 30px; height: 30px;
+    border-top: 2px solid var(--gold);
+    border-left: 2px solid var(--gold);
+  }
+  .transcript-frame::after {
+    content:''; position: absolute;
+    bottom: -1px; right: -1px; width: 30px; height: 30px;
+    border-bottom: 2px solid var(--gold);
+    border-right: 2px solid var(--gold);
+  }
+  .transcript-header {
+    font-family: 'Space Mono', monospace;
+    color: var(--gold); font-size: 11px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding-bottom: 16px; margin-bottom: 24px;
+    border-bottom: 1px dashed var(--gold-dim);
+    display: flex; justify-content: space-between;
+  }
+  .transcript-line {
+    display: grid; grid-template-columns: 90px 1fr;
+    gap: 20px; padding: 10px 0;
+    align-items: baseline;
+    animation: fadeIn 0.4s ease backwards;
+  }
+  .speaker {
+    font-family: 'Space Mono', monospace;
+    color: var(--gold); font-size: 11px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    text-align: right;
+  }
+  .speaker.you { color: var(--cream-dim); }
+  .dialogue {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px; line-height: 1.6;
+    color: var(--cream); font-style: italic;
+  }
+  .speaker.you + .dialogue { color: var(--cream-dim); }
+
+  .cue {
+    font-family: 'Space Mono', monospace;
+    color: var(--gold); font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    background: rgba(212, 166, 86, 0.1); padding: 2px 6px;
+    border-left: 2px solid var(--gold); margin-left: 8px;
+    display: inline-block; cursor: help;
+    font-style: normal;
+  }
+
+  /* TELLS PANEL */
+  .tells {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    padding: 32px; margin: 40px 0;
+  }
+  .tells-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; color: var(--gold);
+    margin-bottom: 20px;
+    text-align: center;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--gold-dim);
+  }
+  .tell-grid {
+    display: grid; gap: 20px;
+  }
+  .tell-item {
+    display: grid; grid-template-columns: 60px 1fr;
+    gap: 20px; align-items: start;
+    padding-bottom: 20px; border-bottom: 1px dashed var(--border);
+  }
+  .tell-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .tell-num {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic; font-size: 40px;
+    color: var(--gold); line-height: 1;
+  }
+  .tell-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; color: var(--cream);
+    margin-bottom: 6px;
+  }
+  .tell-body {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px; color: var(--cream-dim);
+    line-height: 1.6;
+  }
+
+  /* PULL QUOTE */
+  .pull-quote {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic; font-size: 34px;
+    line-height: 1.3; color: var(--cream);
+    text-align: center; max-width: 780px;
+    margin: 60px auto; padding: 32px 0;
+    border-top: 1px solid var(--gold-dim);
+    border-bottom: 1px solid var(--gold-dim);
+    position: relative;
+  }
+  .pull-quote::before, .pull-quote::after {
+    font-family: 'DM Serif Display', serif;
+    color: var(--gold); font-size: 60px;
+    position: absolute; opacity: 0.6;
+  }
+  .pull-quote::before { content: '"'; top: -8px; left: -20px; }
+  .pull-quote::after { content: '"'; bottom: -40px; right: -20px; }
+
+  /* DIAL ROTATION */
+  .dial-viz {
+    display: flex; justify-content: center; margin: 40px 0;
+  }
+  .dial {
+    width: 200px; height: 200px; border-radius: 50%;
+    border: 4px solid var(--gold);
+    background: radial-gradient(circle at center, var(--bg-2), var(--bg));
+    position: relative;
+    box-shadow: 0 20px 40px var(--shadow), inset 0 0 40px rgba(212, 166, 86, 0.1);
+  }
+  .dial::before {
+    content: ''; position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 30px var(--gold);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+  .dial-number {
+    position: absolute; font-family: 'DM Serif Display', serif;
+    color: var(--cream); font-size: 16px;
+    width: 24px; height: 24px; text-align: center;
+    line-height: 24px;
+  }
+
+  /* PLAYBOOK */
+  .playbook {
+    display: grid; gap: 24px; margin: 40px 0;
+  }
+  .rule {
+    background: var(--bg-2); border: 1px solid var(--border);
+    padding: 32px; position: relative;
+    box-shadow: 0 12px 30px var(--shadow);
+  }
+  .rule-num {
+    position: absolute; top: -20px; left: 32px;
+    background: var(--gold); color: var(--bg);
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; padding: 4px 16px;
+    letter-spacing: 0.1em;
+  }
+  .rule-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px; color: var(--cream);
+    margin-bottom: 12px; margin-top: 8px;
+  }
+  .rule-title .italic { font-style: italic; color: var(--gold); }
+  .rule-body {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; line-height: 1.7;
+    color: var(--cream-dim);
+  }
+  .rule-body strong { color: var(--cream); }
+
+  /* NAV */
+  .nav-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 32px; margin-top: 60px;
+    border-top: 1px solid var(--gold-dim);
+  }
+  .btn {
+    padding: 14px 28px; background: transparent;
+    border: 1px solid var(--gold); color: var(--gold);
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer;
+    transition: all 0.2s; text-decoration: none; display: inline-block;
+  }
+  .btn:hover { background: var(--gold); color: var(--bg); }
+  .btn.primary { background: var(--gold); color: var(--bg); }
+  .btn.primary:hover { background: var(--cream); border-color: var(--cream); }
+
+  /* CHAPTER PROGRESS */
+  .chapters {
+    display: flex; justify-content: center; gap: 32px;
+    padding: 24px 0; border-bottom: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  }
+  .chapter-mark { color: var(--cream-mute); position: relative; padding-bottom: 8px; }
+  .chapter-mark.done { color: var(--cream-dim); }
+  .chapter-mark.active { color: var(--gold); }
+  .chapter-mark.active::after {
+    content:''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: var(--gold);
+  }
+
+  /* COMPLETE */
+  .complete {
+    text-align: center; padding: 60px 40px;
+    background: var(--bg-2); border: 1px solid var(--gold-dim);
+    margin: 40px 0; position: relative;
+  }
+  .complete-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(40px, 5vw, 60px);
+    line-height: 1; margin-bottom: 20px;
+    color: var(--cream);
+  }
+  .complete-title .italic { font-style: italic; color: var(--gold); }
+
+  @media (max-width: 768px) {
+    .content { padding: 40px 20px; }
+    .transcript-line { grid-template-columns: 1fr; gap: 4px; }
+    .speaker { text-align: left; }
+    .brass-bar { padding: 10px 16px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="brass-bar">
+  <a href="index.html">← EXIT</a>
+  <span class="center">MODULE V · VISHING · VOICE-BASED ATTACKS</span>
+  <span id="clock">--:--:--</span>
+</div>
+
+<div class="chapters">
+  <span class="chapter-mark active">I · CURTAIN</span>
+  <span class="chapter-mark">II · THE CALL</span>
+  <span class="chapter-mark">III · THE TELLS</span>
+  <span class="chapter-mark">IV · CLOSING</span>
+</div>
+
+<!-- SCENE 1 -->
+<section class="scene active" id="scene-1">
+  <div class="marquee">
+    <div class="now-showing">◆ Now Showing · Module Five ◆</div>
+    <h1 class="title">The Voice<br><span class="italic">on the Line.</span></h1>
+    <div class="tagline">A short study in the oldest attack still working — modernized with a phone that knows your name.</div>
+    <div class="runtime">Runtime · 8 Minutes · Interactive</div>
+  </div>
+
+  <div class="content">
+    <div class="prose">
+      Someone calls. They know your name. They know your company. They know your extension. They speak with confidence and courtesy. They ask a simple question, then a slightly harder one, then a request that requires trust. By the time you hang up, the damage is done — and the strangest part is you'd tell your family the call felt normal.
+    </div>
+
+    <div class="prose">
+      <strong>This is vishing:</strong> phishing over the phone. It works because voice is the channel your brain trusts most. This module teaches you to distrust it — precisely, and only where it matters.
+    </div>
+
+    <div class="dial-viz">
+      <div class="dial"></div>
+    </div>
+
+    <div class="nav-row">
+      <a href="index.html" class="btn">← Exit Theater</a>
+      <button class="btn primary" onclick="goToScene(2)">Raise the Curtain →</button>
+    </div>
+  </div>
+</section>
+
+<!-- SCENE 2: THE CALL -->
+<section class="scene" id="scene-2">
+  <div class="content">
+    <div class="act-label">ACT II · A CALL AT 2:47 PM</div>
+    <h2 class="act-title">The <span class="italic">script</span> they use on you.</h2>
+    <p class="prose">
+      Below is a real vishing call, reconstructed from actual incidents. Read each line and hover over the <span class="cue" style="cursor:default;">TELL</span> markers to see what an attacker is doing at that moment.
+    </p>
+
+    <div class="transcript-frame">
+      <div class="transcript-header">
+        <span>▶ CALL RECORDING · TUESDAY 14:47 · INBOUND · 6 MIN 22 SEC</span>
+        <span>MOD.V.SC.02</span>
+      </div>
+
+      <div class="transcript-line" style="animation-delay:0.1s">
+        <div class="speaker">Caller</div>
+        <div class="dialogue">
+          Hi, is this Alex? Alex Chen from Accounts Receivable?
+          <span class="cue" title="They already have your name and department. Sourced from LinkedIn, your company website, or a data breach.">TELL 01</span>
+        </div>
+      </div>
+
+      <div class="transcript-line" style="animation-delay:0.3s">
+        <div class="speaker you">You</div>
+        <div class="dialogue">Yes, this is Alex.</div>
+      </div>
+
+      <div class="transcript-line" style="animation-delay:0.5s">
+        <div class="speaker">Caller</div>
+        <div class="dialogue">
+          Great — this is Marcus with the Microsoft security team.
+          <span class="cue" title="Impersonating a trusted vendor. Real Microsoft security does not call you directly.">TELL 02</span>
+          We're seeing some unusual sign-in activity on your account and I need to walk through some quick verification with you.
+        </div>
+      </div>
+
+      <div class="transcript-line" style="animation-delay:0.7s">
+        <div class="speaker you">You</div>
+        <div class="dialogue">Oh — is something wrong?</div>
+      </div>
+
+      <div class="transcript-line" style="animation-delay:0.9s">
+        <div class="speaker">Caller</div>
+        <div class="dialogue">
+          Nothing to panic about, but we saw a sign-in attempt from Bulgaria this morning
+          <span class="cue" title="Manufacturing urgency + geographic threat. Puts you on the defensive.">TELL 03</span>
+          and we want to make sure it wasn't you before we lock the account. Can you tell me — are you at your desk right now?
+        </div>
+      </div>
+
+      <div class="transcript-line" style="animation-delay:1.1s">
+        <div class="speaker you">You</div>
+        <div class="dialogue">Yes, I'm here.</div>
+      </div>
+
+      <div class="transcript-line" style="animation-delay:1.3s">
+        <div class="speaker">Caller</div>
+        <div class="dialogue">
+          Perfect. I'm going to send a verification code to your phone right now.
+          <span class="cue" title="This is the moment. They just triggered a real MFA prompt — from a login THEY are attempting on your account.">TELL 04</span>
+          When you receive it, please just read me the six-digit number so we can confirm the account is still yours and reject the Bulgarian sign-in.
+        </div>
+      </div>
+
+      <div class="transcript-line" style="animation-delay:1.5s">
+        <div class="speaker you">You</div>
+        <div class="dialogue">Okay… I just got a text. It says 847293.</div>
+      </div>
+
+      <div class="transcript-line" style="animation-delay:1.7s">
+        <div class="speaker">Caller</div>
+        <div class="dialogue">
+          Thank you Alex, we've secured your account. Have a great afternoon.
+          <span class="cue" title="They just used your MFA code to complete a real sign-in. They are now in your mailbox, moving fast.">TELL 05</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pull-quote">
+      The voice is calm. The story makes sense. The request seems small. That is the entire attack.
+    </div>
+
+    <div class="nav-row">
+      <button class="btn" onclick="goToScene(1)">← Back</button>
+      <button class="btn primary" onclick="goToScene(3)">See the Tells →</button>
+    </div>
+  </div>
+</section>
+
+<!-- SCENE 3: THE TELLS -->
+<section class="scene" id="scene-3">
+  <div class="content">
+    <div class="act-label">ACT III · THE FIVE TELLS</div>
+    <h2 class="act-title">Five signals in <span class="italic">every vishing call.</span></h2>
+    <p class="prose">
+      Every vishing call — whether from a "Microsoft engineer," "your bank's fraud team," a "delivery driver," or a "help desk agent" — shares the same skeleton. Learn the skeleton and every disguise looks the same.
+    </p>
+
+    <div class="tells">
+      <div class="tell-grid">
+        <div class="tell-item">
+          <div class="tell-num">I.</div>
+          <div>
+            <div class="tell-title">They called you.</div>
+            <div class="tell-body">Legitimate IT, banks, and vendors sometimes do call — but they almost never ask you to do anything sensitive on that call. If someone unexpectedly calls and needs an action from you (a code, a password, a payment, a click), <strong>the call itself is the red flag.</strong> Hang up, call the organization's real number, and start over.</div>
+          </div>
+        </div>
+        <div class="tell-item">
+          <div class="tell-num">II.</div>
+          <div>
+            <div class="tell-title">They already know you.</div>
+            <div class="tell-body">Name, title, department, sometimes even a recent project. This information is trivially available — LinkedIn, company site, data breaches. <strong>Familiarity is not authentication.</strong> A stranger knowing your role is not proof they're legitimate.</div>
+          </div>
+        </div>
+        <div class="tell-item">
+          <div class="tell-num">III.</div>
+          <div>
+            <div class="tell-title">They introduce urgency, then friendliness.</div>
+            <div class="tell-body">"Your account will be locked" / "Suspicious activity detected" / "We just need to confirm quickly." The urgency triggers fear. The friendliness makes you cooperative. Together they short-circuit your judgment. <strong>Recognize the pattern; it's the attack.</strong></div>
+          </div>
+        </div>
+        <div class="tell-item">
+          <div class="tell-num">IV.</div>
+          <div>
+            <div class="tell-title">They ask for a code, a click, or a payment.</div>
+            <div class="tell-body">No legitimate support call requires you to <strong>read out an MFA code, click a link they text you, approve an MFA push, share your password, or make a payment.</strong> If they ask, they are attacking you. Every single time. There are no exceptions to this rule.</div>
+          </div>
+        </div>
+        <div class="tell-item">
+          <div class="tell-num">V.</div>
+          <div>
+            <div class="tell-title">The voice may not be a person at all.</div>
+            <div class="tell-body">AI voice cloning now needs three seconds of audio to convincingly impersonate your CEO, your spouse, your child. If a familiar voice makes an unusual request, especially involving money or credentials — verify through a different channel before acting. <strong>Ask something only the real person would know.</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn" onclick="goToScene(2)">← Back</button>
+      <button class="btn primary" onclick="goToScene(4)">Closing Act →</button>
+    </div>
+  </div>
+</section>
+
+<!-- SCENE 4: CLOSING -->
+<section class="scene" id="scene-4">
+  <div class="content">
+    <div class="act-label">ACT IV · THE CLOSING</div>
+    <h2 class="act-title">Your <span class="italic">standing rules.</span></h2>
+    <p class="prose">
+      Voice attacks work because they're personal, urgent, and hard to verify in the moment. These rules make verification easy and give you an off-ramp from any call that feels off.
+    </p>
+
+    <div class="playbook">
+      <div class="rule">
+        <div class="rule-num">RULE ONE</div>
+        <div class="rule-title">Hang up. <span class="italic">Call back.</span></div>
+        <div class="rule-body">
+          The single most powerful defense against vishing: <strong>end the call, look up the real number of the organization they claimed to be from, and call that number.</strong> A real support agent will thank you for verifying. A scammer's number won't route to the real company. This one habit stops 95% of vishing.
+        </div>
+      </div>
+      <div class="rule">
+        <div class="rule-num">RULE TWO</div>
+        <div class="rule-title">Never share <span class="italic">a code.</span></div>
+        <div class="rule-body">
+          MFA codes, verification codes, one-time passwords — <strong>you never say these out loud to anyone.</strong> Not to "Microsoft." Not to "your bank." Not to "IT." A code is a temporary key to your account. Sharing it is handing over the key. There are no legitimate reasons to read a code to a caller.
+        </div>
+      </div>
+      <div class="rule">
+        <div class="rule-num">RULE THREE</div>
+        <div class="rule-title">Verify a <span class="italic">familiar voice.</span></div>
+        <div class="rule-body">
+          If someone you know — spouse, child, boss — calls with an unusual money or credential request, verify on another channel before acting. <strong>Send them a text at their known number, or ask a question only they would know</strong> ("what did we have for dinner Sunday?"). AI cloning is real, cheap, and used daily. Trust the identity, not the sound.
+        </div>
+      </div>
+      <div class="rule">
+        <div class="rule-num">RULE FOUR</div>
+        <div class="rule-title">Real IT will <span class="italic">not mind.</span></div>
+        <div class="rule-body">
+          You may feel rude asking a caller to prove who they are. Get over it. Real IT people, real bank fraud teams, real vendor support — <strong>they will happily wait while you hang up and call back.</strong> If a caller pressures you to stay on the line, or gets angry when you ask to verify, that is proof they are not legitimate.
+        </div>
+      </div>
+      <div class="rule">
+        <div class="rule-num">RULE FIVE</div>
+        <div class="rule-title">Report the strange calls.</div>
+        <div class="rule-body">
+          If you get a suspicious call — even if you didn't fall for it — tell IT/Security. Vishing campaigns often hit multiple employees in the same day. Your report is the early warning that protects the coworker who might have said yes. <strong>You don't need proof, just the story.</strong> Two minutes of your time; hours of theirs saved.
+        </div>
+      </div>
+    </div>
+
+    <div class="pull-quote">
+      Voice is the last channel that feels real. That's exactly why attackers use it. And exactly why you should trust it least.
+    </div>
+
+    <div class="complete">
+      <div class="complete-title">The curtain <span class="italic">falls.</span></div>
+      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream-dim);max-width:600px;margin:16px auto 32px;">
+        You now recognize the shape of a vishing call. Clear the knowledge check below to earn your Voice on the Line badge.
+      </p>
+      <button class="btn primary" id="startCheckBtn" onclick="revealAssessment()">Take the Knowledge Check →</button>
+    </div>
+
+    <div id="shadowproof-assessment" style="margin-top:32px;"></div>
+
+    <div class="nav-row">
+      <button class="btn" onclick="goToScene(3)">← Back</button>
+      <a href="index.html" class="btn">Return to Suite →</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  const MODULE_ID = 'vishing';
+  const totalScenes = 4;
+  let currentScene = 1;
+
+  function goToScene(n) {
+    if (n < 1 || n > totalScenes) return;
+    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+    document.getElementById('scene-' + n).classList.add('active');
+    currentScene = n;
+    document.querySelectorAll('.chapter-mark').forEach((m, i) => {
+      m.classList.remove('active','done');
+      if (i + 1 < n) m.classList.add('done');
+      if (i + 1 === n) m.classList.add('active');
+    });
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function revealAssessment() {
+    document.getElementById('startCheckBtn').style.display = 'none';
+    ShadowproofAssessment.init({
+      moduleId: MODULE_ID,
+      moduleTitle: 'The Voice on the Line',
+      questions: window.SHADOWPROOF_QUESTIONS.vishing
+    });
+    document.getElementById('shadowproof-assessment').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function updateClock() {
+    document.getElementById('clock').textContent = new Date().toTimeString().slice(0,8);
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+</script>
+
+<script src="questions.js"></script>
+<script src="assessment.js"></script>
+
+</body>
+</html>
