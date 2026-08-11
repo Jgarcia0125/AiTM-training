@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHADOWPROOF // Cybersecurity Training Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Fraunces:ital,wght@0,400;0,600;0,800;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d10;
+    --bg-2: #0f1418;
+    --surface: #131a20;
+    --surface-2: #1a232b;
+    --border: #243038;
+    --text: #e8eef2;
+    --text-dim: #8a9ba8;
+    --text-muted: #5a6b78;
+    --accent: #00ff9f;
+    --accent-dim: #00b873;
+    --danger: #ff4757;
+    --warn: #ffb84d;
+    --info: #5ab9ff;
+    --purple: #b48fff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    line-height: 1.6; min-height: 100vh; overflow-x: hidden;
+  }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 3px);
+    pointer-events:none; z-index:1000; opacity:0.4; mix-blend-mode:multiply;
+  }
+  .cmd-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10, 13, 16, 0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .cmd-bar-left { display: flex; gap: 24px; align-items: center; }
+  .cmd-bar-right { display: flex; gap: 16px; align-items: center; color: var(--text-muted); }
+  .logo { color: var(--accent); font-weight: 800; letter-spacing: 0.15em; }
+  .logo::before { content: '◉ '; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .status-pill { padding: 4px 10px; border: 1px solid var(--border); border-radius: 2px; font-size: 10px; color: var(--text-dim); }
+
+  .hero {
+    min-height: 70vh; display: flex; flex-direction: column; justify-content: center;
+    padding: 80px 48px 60px; position: relative; overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px; opacity: 0.15;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 11px;
+    letter-spacing: 0.2em; color: var(--accent); margin-bottom: 32px;
+    padding: 6px 12px; border: 1px solid var(--accent-dim);
+    background: rgba(0, 255, 159, 0.05); width: fit-content;
+  }
+  .hero-tag::before { content:''; width:6px; height:6px; background: var(--accent); border-radius:50%; animation: pulse 1.5s infinite; }
+  h1.title {
+    font-family: 'Fraunces', serif; font-size: clamp(56px, 9vw, 130px);
+    line-height: 0.92; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 24px;
+  }
+  h1.title .italic { font-style: italic; font-weight: 600; color: var(--accent); }
+  .hero-sub {
+    font-family: 'Fraunces', serif; font-size: clamp(18px, 1.6vw, 22px);
+    color: var(--text-dim); max-width: 780px; margin: 32px 0 48px; line-height: 1.5;
+  }
+  .hero-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px; background: var(--border); max-width: 900px;
+  }
+  .stat-cell { background: var(--bg); padding: 16px 20px; }
+  .stat-cell .label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .stat-cell .value { font-size: 22px; color: var(--text); font-weight: 500; font-family: 'Fraunces', serif; }
+  .stat-cell .value.accent { color: var(--accent); }
+
+  /* SECTION HEADERS */
+  .section {
+    padding: 80px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .section-title .italic { font-style: italic; font-weight: 600; color: var(--accent); }
+  .section-sub {
+    font-family: 'Fraunces', serif;
+    color: var(--text-dim);
+    font-size: 18px;
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+
+  /* MODULE GRID */
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .module-card {
+    background: var(--bg-2);
+    padding: 28px 24px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    transition: all 0.25s ease;
+    min-height: 240px;
+    cursor: pointer;
+  }
+  .module-card:hover {
+    background: var(--surface);
+    transform: translateY(-2px);
+  }
+  .module-card.locked { opacity: 0.4; cursor: not-allowed; }
+  .module-card.locked:hover { transform: none; background: var(--bg-2); }
+
+  .module-card-top {
+    display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;
+  }
+  .module-num {
+    font-size: 11px; color: var(--text-muted);
+    letter-spacing: 0.2em; font-weight: 700;
+  }
+  .module-status {
+    font-size: 9px; letter-spacing: 0.15em;
+    padding: 3px 8px; border: 1px solid var(--border);
+    color: var(--text-muted); text-transform: uppercase;
+  }
+  .module-status.complete { border-color: var(--accent); color: var(--accent); background: rgba(0,255,159,0.08); }
+  .module-status.available { border-color: var(--info); color: var(--info); }
+  .module-status.coming { border-color: var(--text-muted); color: var(--text-muted); }
+
+  .module-icon {
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .module-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    line-height: 1.1;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .module-title .italic { font-style: italic; color: var(--accent); font-weight: 600; }
+  .module-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    flex: 1;
+  }
+  .module-meta {
+    display: flex; gap: 16px; font-size: 10px;
+    color: var(--text-muted); letter-spacing: 0.1em;
+    text-transform: uppercase; margin-top: 8px;
+    padding-top: 12px; border-top: 1px solid var(--border);
+  }
+  .module-meta .risk-hi { color: var(--danger); }
+  .module-meta .risk-md { color: var(--warn); }
+  .module-meta .risk-lo { color: var(--info); }
+
+  /* Category label */
+  .cat-label {
+    font-size: 10px; letter-spacing: 0.2em;
+    color: var(--text-muted); margin-bottom: 20px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .cat-label::before { content: '◆'; color: var(--accent); }
+
+  /* PROGRESS BAR */
+  .progress-summary {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 24px 28px; margin-bottom: 48px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    flex-wrap: wrap;
+  }
+  .progress-info { flex: 1; min-width: 200px; }
+  .progress-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; }
+  .progress-bar {
+    height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden;
+    margin-top: 12px; position: relative;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--info));
+    transition: width 0.6s ease; box-shadow: 0 0 12px var(--accent);
+  }
+  .progress-count {
+    font-family: 'Fraunces', serif; font-size: 42px; font-weight: 800;
+    color: var(--accent); line-height: 1;
+  }
+  .progress-count .total { color: var(--text-muted); font-size: 24px; }
+
+  .reset-btn {
+    padding: 10px 16px; background: transparent;
+    border: 1px solid var(--border); color: var(--text-dim);
+    font-family: inherit; font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+  }
+  .reset-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+  footer {
+    padding: 40px 48px; text-align: center; color: var(--text-muted);
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    border-top: 1px solid var(--border); margin-top: 40px;
+  }
+
+  @media (max-width: 768px) {
+    .hero { padding: 60px 20px 40px; }
+    .section { padding: 60px 20px; }
+    .cmd-bar-right { display: none; }
+    .cmd-bar { padding: 10px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cmd-bar">
+  <div class="cmd-bar-left">
+    <span class="logo">SHADOWPROOF</span>
+    <span class="status-pill">TRAINING SUITE v1.0</span>
+  </div>
+  <div class="cmd-bar-right">
+    <span>USER: OPERATOR</span>
+    <span id="clock">--:--:--</span>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag">CYBERSECURITY AWARENESS / END-USER PROGRAM</div>
+    <h1 class="title">
+      You are the<br>
+      <span class="italic">first line</span><br>
+      of defense.
+    </h1>
+    <p class="hero-sub">
+      Every one of these attacks is designed to get past your company's security tools by targeting <strong style="color:var(--text)">you</strong> directly. Sixteen short, interactive modules. Each takes about ten minutes. Each teaches you exactly what to look for. No lectures, no fluff — just the patterns that separate a safe click from a bad one.
+    </p>
+    <div class="hero-stats">
+      <div class="stat-cell"><div class="label">Modules</div><div class="value">16</div></div>
+      <div class="stat-cell"><div class="label">Avg Time / Module</div><div class="value">~10 min</div></div>
+      <div class="stat-cell"><div class="label">Format</div><div class="value">Interactive</div></div>
+      <div class="stat-cell"><div class="label">Prerequisites</div><div class="value accent">None</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="section">
+  <div class="progress-summary">
+    <div class="progress-info">
+      <div class="progress-label">Your Progress</div>
+      <div style="font-family:'Fraunces',serif;font-size:16px;color:var(--text-dim);" id="progressText">Complete modules to track your progress. Data stays in your browser.</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="progress-count"><span id="completeCount">0</span><span class="total">/16</span></div>
+    <button class="reset-btn" onclick="resetProgress()">Reset Progress</button>
+  </div>
+
+  <div class="cat-label">TIER 01 // EMAIL & MESSAGING ATTACKS</div>
+  <div class="module-grid" id="tier1"></div>
+</div>
+
+<div class="section">
+  <div class="cat-label">TIER 02 // IDENTITY & ACCESS ATTACKS</div>
+  <div class="module-grid" id="tier2"></div>
+</div>
+
+<div class="section">
+  <div class="cat-label">TIER 03 // PHYSICAL & ENVIRONMENTAL ATTACKS</div>
+  <div class="module-grid" id="tier3"></div>
+</div>
+
+<div class="section">
+  <div class="cat-label">TIER 04 // HUMAN & OPERATIONAL RISKS</div>
+  <div class="module-grid" id="tier4"></div>
+</div>
+
+<footer>
+  SHADOWPROOF // ADVERSARIAL TRAINING SUITE — BUILT FOR PEOPLE, NOT PASSWORDS
+</footer>
+
+<script>
+  const modules = [
+    // TIER 1: EMAIL & MESSAGING
+    { id:'aitm', tier:1, num:'01', icon:'👻', title:'Ghost Session', subtitle:'AiTM Phishing', desc:'Attackers sit between you and a real login page to steal your session — even with MFA. Learn the tells.', time:'10 min', risk:'HIGH', file:'01-aitm.html' },
+    { id:'bec', tier:1, num:'02', icon:'💼', title:'The CEO Text', subtitle:'Business Email Compromise', desc:'"Are you at your desk? I need a favor." How wire fraud and gift-card scams start with a familiar name.', time:'8 min', risk:'HIGH', file:'02-bec.html' },
+    { id:'smishing', tier:1, num:'03', icon:'📱', title:'Silent Signal', subtitle:'SMS Phishing (Smishing)', desc:'That "delivery failed" text isn\'t from UPS. Learn the format of texts designed to steal credentials.', time:'7 min', risk:'MEDIUM', file:'03-smishing.html' },
+    { id:'quishing', tier:1, num:'04', icon:'🔲', title:'The Painted Door', subtitle:'QR Code Phishing (Quishing)', desc:'QR codes bypass every email filter you have. Learn where they hide and how to check them safely.', time:'7 min', risk:'MEDIUM', file:'04-quishing.html' },
+    { id:'ransomware', tier:1, num:'05', icon:'🔒', title:'The Locked Door', subtitle:'Ransomware & Attachments', desc:'One click on an "invoice.pdf" can encrypt your entire company\'s files. Learn which attachments to fear.', time:'9 min', risk:'HIGH', file:'13-ransomware.html' },
+
+    // TIER 2: IDENTITY & ACCESS
+    { id:'vishing', tier:2, num:'06', icon:'📞', title:'The Voice on the Line', subtitle:'Vishing & Deepfake Calls', desc:'Someone from "IT" calls you by name. They sound convincing. Learn why voice is now the weakest channel.', time:'8 min', risk:'HIGH', file:'05-vishing.html' },
+    { id:'mfa-fatigue', tier:2, num:'07', icon:'🔔', title:'Endless Knocking', subtitle:'MFA Fatigue / Push Bombing', desc:'Your phone won\'t stop buzzing with approval prompts. Learn why "just tap approve" is a trap.', time:'6 min', risk:'HIGH', file:'06-mfa-fatigue.html' },
+    { id:'oauth', tier:2, num:'08', icon:'🎫', title:'The Handed Key', subtitle:'OAuth Consent Phishing', desc:'You grant an app access "just to view a doc" — and it reads your entire mailbox forever. Learn to spot it.', time:'8 min', risk:'MEDIUM', file:'07-oauth.html' },
+    { id:'passwords', tier:2, num:'09', icon:'🗝️', title:'The Master Key', subtitle:'Password Hygiene', desc:'One reused password can unlock your work, your bank, and your identity. Build habits that scale.', time:'8 min', risk:'MEDIUM', file:'08-passwords.html' },
+    { id:'deepfake', tier:2, num:'10', icon:'🎭', title:'The Perfect Copy', subtitle:'Deepfakes & AI Impersonation', desc:'Video calls, voice notes, and emails that look like your boss — because AI made them. Verify differently.', time:'9 min', risk:'HIGH', file:'14-deepfake.html' },
+
+    // TIER 3: PHYSICAL & ENVIRONMENTAL
+    { id:'usb', tier:3, num:'11', icon:'💾', title:'The Gift Nobody Sent', subtitle:'USB Drops & Rogue Devices', desc:'A branded USB stick in the parking lot. A "free" charging cable at a conference. Never trust hardware you didn\'t buy.', time:'6 min', risk:'MEDIUM', file:'09-usb.html' },
+    { id:'wifi', tier:3, num:'12', icon:'📶', title:'The Open Window', subtitle:'Public Wi-Fi & Travel Security', desc:'Airports, hotels, coffee shops. Learn the simple habits that protect you when you\'re away from the office.', time:'7 min', risk:'MEDIUM', file:'10-wifi.html' },
+    { id:'social-eng', tier:3, num:'13', icon:'🚪', title:'Held Door', subtitle:'Social Engineering & Tailgating', desc:'"I forgot my badge, could you let me in?" Politeness is the most exploited security control there is.', time:'8 min', risk:'MEDIUM', file:'11-social-eng.html' },
+    { id:'home-network', tier:3, num:'14', icon:'🏠', title:'The Home Front', subtitle:'Home Network & Personal Devices', desc:'Your router, your smart TV, your kid\'s laptop — all now share a network with your work devices.', time:'8 min', risk:'LOW', file:'15-home-network.html' },
+
+    // TIER 4: HUMAN & OPERATIONAL
+    { id:'insider', tier:4, num:'15', icon:'📁', title:'The Careless Hand', subtitle:'Insider Threat & Data Handling', desc:'Most data leaks aren\'t malicious — they\'re accidental. Where sensitive data belongs, and where it doesn\'t.', time:'8 min', risk:'MEDIUM', file:'12-insider.html' },
+    { id:'reporting', tier:4, num:'16', icon:'🚨', title:'The First Nine Minutes', subtitle:'When & How to Report', desc:'Speed matters more than certainty. Learn when to report, what to include, and why embarrassment costs nothing.', time:'5 min', risk:'CRITICAL', file:'16-reporting.html' },
+  ];
+
+  const STORAGE_KEY = 'shadowproof_progress_v1';
+
+  function getProgress() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+    catch { return {}; }
+  }
+
+  function setComplete(id) {
+    const p = getProgress();
+    p[id] = { completed: true, ts: Date.now() };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+  }
+
+  function resetProgress() {
+    if (confirm('Reset all module progress? This clears your local completion tracking.')) {
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    }
+  }
+
+  function renderTier(tier) {
+    const container = document.getElementById('tier' + tier);
+    const progress = getProgress();
+    container.innerHTML = '';
+    modules.filter(m => m.tier === tier).forEach(m => {
+      const done = progress[m.id]?.completed;
+      const riskClass = m.risk === 'HIGH' || m.risk === 'CRITICAL' ? 'risk-hi' : m.risk === 'MEDIUM' ? 'risk-md' : 'risk-lo';
+      const card = document.createElement('a');
+      card.className = 'module-card';
+      card.href = m.file;
+      card.innerHTML = `
+        <div class="module-card-top">
+          <span class="module-num">MODULE ${m.num}</span>
+          <span class="module-status ${done ? 'complete' : 'available'}">${done ? '✓ COMPLETE' : 'AVAILABLE'}</span>
+        </div>
+        <div class="module-icon">${m.icon}</div>
+        <div class="module-title">${m.title.split(' ').slice(0,-1).join(' ')} <span class="italic">${m.title.split(' ').slice(-1)}</span></div>
+        <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:-4px;">${m.subtitle}</div>
+        <div class="module-desc">${m.desc}</div>
+        <div class="module-meta">
+          <span>⏱ ${m.time}</span>
+          <span class="${riskClass}">▲ ${m.risk} RISK</span>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function renderProgress() {
+    const progress = getProgress();
+    const done = modules.filter(m => progress[m.id]?.completed).length;
+    const total = modules.length;
+    const pct = (done / total) * 100;
+    document.getElementById('completeCount').textContent = done;
+    document.querySelector('.progress-count .total').textContent = '/' + total;
+    document.getElementById('progressFill').style.width = pct + '%';
+    const msg = done === 0 ? 'Complete modules to track your progress. Data stays in your browser.'
+      : done === total ? '🎉 All modules complete. You are officially harder to fool than yesterday.'
+      : `${done} of ${total} modules complete. Keep going — you're building real defenses.`;
+    document.getElementById('progressText').textContent = msg;
+  }
+
+  function render() {
+    [1,2,3,4].forEach(renderTier);
+    renderProgress();
+  }
+
+  function updateClock() {
+    document.getElementById('clock').textContent = new Date().toTimeString().slice(0,8);
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+  render();
+
+  // Re-render when returning from a module (in case they completed one)
+  window.addEventListener('focus', render);
+  window.addEventListener('pageshow', render);
+</script>
+</body>
+</html>
